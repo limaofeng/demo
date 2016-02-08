@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>webscoket测试</title>
+    <style>
+        #output{
+            font-size: 12px;
+        }
+    </style>
+    <script type="text/javascript">
+
+        function init(){
+            window.output = document.getElementById("output");
+            window.opt = document.getElementById("opt");
+        }
+
+        function connect() {
+            output.innerHTML = '';
+            var nickname = document.getElementById("nickname").value;
+            window.client = new WebSocket(document.getElementById("wsUrl").value);
+            client.onopen = function (evt) {
+                client.send(nickname);
+            };
+            client.onclose = function (evt) {
+                console.log(evt);
+            };
+            client.onmessage = function (evt) {
+                var time = new Date();
+                console.log(evt);
+                output.innerHTML += evt.data + '<br/>';
+            };
+            client.onerror = function (evt) {
+                console.log(evt);
+            };
+            opt.value = '断开连接';
+            opt.onclick = close;
+        }
+
+        function close(){
+            client.close();
+            opt.value = '开始建立连接';
+            opt.onclick = connect;
+        }
+
+        function sendMsg(){
+            var msg = document.getElementById("input").value;
+            output.innerHTML += '我说 ==>' + msg + '<br/>';
+            client.send(msg);
+            document.getElementById("input").value = '';
+        }
+
+    </script>
+</head>
+<body onload="init()">
+服务端地址:<input id="wsUrl" type="text" value="ws://115.29.185.235:8090"/><br/>
+昵称:<input id="nickname" type="text" value="小明"/>
+<br/>
+<br/>
+<input id="opt" type="button" value="开始建立连接" onclick="connect()"/>
+<div id="output" style="width:500px;height: 200px;border: 1px crimson double"></div>
+<br/>
+<input id="input" type="text" value=""/><button onclick="sendMsg()">发送消息</button>
+</body>
+</html>
